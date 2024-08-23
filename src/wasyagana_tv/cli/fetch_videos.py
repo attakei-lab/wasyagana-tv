@@ -8,28 +8,30 @@ from googleapiclient.discovery import build
 
 PLAYLISTS = [
     "UUReBAqqC-hc9d70gOftfitg",  # わしゃがなTV本体
+    "PLO-B0bLDsrNBmCVuaOmYETDLS9VsXRelq",  # 4GamerSP内 / わしゃがなTV（おまけ動画）
 ]
 
 
 def collect_videos(credentials, interval: int = 1):
     youtube_client = build("youtube", "v3", credentials=credentials)
-    params = {
-        "part": "id,snippet",
-        "playlistId": PLAYLISTS[0],
-        "maxResults": 50,
-    }
-    cnt = 1
     items = []
-    while True:
-        print(f"Call {cnt}")
-        resp = youtube_client.playlistItems().list(**params).execute()
-        items += resp["items"]
-        next_page_token = resp.get("nextPageToken", None)
-        if not next_page_token:
-            break
-        cnt += 1
-        params["pageToken"] = next_page_token
-        time.sleep(interval)
+    for idx, playlist_id in enumerate(PLAYLISTS):
+        params = {
+            "part": "id,snippet,contentDetails",
+            "playlistId": playlist_id,
+            "maxResults": 50,
+        }
+        cnt = 1
+        while True:
+            print(f"Call {idx+1}-{cnt}")
+            resp = youtube_client.playlistItems().list(**params).execute()
+            items += resp["items"]
+            next_page_token = resp.get("nextPageToken", None)
+            if not next_page_token:
+                break
+            cnt += 1
+            params["pageToken"] = next_page_token
+            time.sleep(interval)
     return items
 
 
