@@ -26,3 +26,4 @@ class Video(BaseModel):
     channel: Channel
     thumbnails: dict[str, Thumbnail]
     published_at: datetime
+    ordered_at: datetime
